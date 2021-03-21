@@ -8,19 +8,18 @@ class Server {
         this.app = express()
         this.port = process.env.PORT ||8000;
         
-        this.routes();
         this.middlewares();
+        this.routes();
         this.dbConnection();
     }
 
     //Metodos
     middlewares(){
         this.app.use(cors()); 
-        this.app.use(express.static('public')); //Aplicacion
     }
     //Rutas
     routes(){
-       this.app.use('/tienda', require ('../routes/tienda'));          
+       this.app.use('/', require ('../routes/tienda'));          
     }
     //Base de datos
      dbConnection(){
