@@ -29,9 +29,9 @@ const busqueda = (req, res = response)=> {
   }
   const obtenerCategoria= (req, res = response)=> {
      //(1.Energetica, 2.pisco, 3.ron, 4.bebida, 5.snak, 6.cerveza, 7.vodka)
-     let categoria = req.params.categoria
-    let sql = `${sql} WHERE c.id=${categoria}`; 
-    db.query(sql, (err, rows, fields) => {
+     let id = req.params.id
+    let categoria = `${sql} WHERE c.id=${id}`; 
+    db.query(categoria, (err, rows, fields) => {
       //  con.end();
       if (err) throw err;
   
