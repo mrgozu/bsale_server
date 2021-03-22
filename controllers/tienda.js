@@ -42,8 +42,8 @@ const busqueda = (req, res = response)=> {
   
 
   const noEncontrada = ( req, res = response) =>{
-    // res.sendFile(process.cwd()+'/public/404.html' )
-    res.json('Ruta no encontrada')
+    res.sendFile(process.cwd()+'/public/404.html' )
+    // res.json('Ruta no encontrada')
   }
 
 module.exports = {
