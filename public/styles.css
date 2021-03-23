@@ -3,6 +3,16 @@ body{
     
 }
 
-.col {
-    margin-bottom: 20px;
+.card {
+    margin-bottom: 20px!important;
+    height: 350px!important;
+}
+
+.imagen{
+    height: 250px;
+    object-fit: contain;
+    /* max-width: ; */
+}
+.justify-content-end{
+    margin-right: 0px!important;
 }

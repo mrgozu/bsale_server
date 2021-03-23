@@ -30,9 +30,7 @@ const crearHtml = () =>{
                     <i class="fas fa-search"></i>
                 </button>
         </div>
-        <button class="btn " type="button" id='carro'>
-        <i class="fas fa-shopping-cart"></i>
-        </button>
+
     </div>
 </nav>
 <div class="container">
@@ -61,12 +59,15 @@ const mostrarProducto =    (producto)=>{
         //Se aproxima haciaa el numero superior del precio descuento (para evitar decimales)
         precioMostrado = Math.ceil(producto.discountPrice); 
         divCard.innerHTML = `
-        <div class='card h-100'>
-        <img src="${producto.url_image||'./assets/img/image-not-found.png'}" class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-title">${producto.name}</h5>
-            <p class="card-text">$${precioMostrado}</p>
-        </div>
+        <div class='card  '>
+            <img src="${producto.url_image||'./assets/img/image-not-found.png'}" class="imagen" alt="...">
+            <div class="card-body ">
+                <h5 class="card-title ">${producto.name}</h5>
+                <p class="card-text border-top text-center font-weight-bold  ">$${precioMostrado}</p>
+            </div>
+                
+            
+            
         </div>`;
         divCard.classList.add('col')
         card.append(divCard);
@@ -101,10 +102,11 @@ const eventoBusqueda = (event)=>{
             card.removeChild(card.firstChild);
           }
         busqueda(inputBuscador.value);
-    }
-    
-    
-    
+    }    
+}
+//Evento agregar pedido
+const agregarPedido= (pedido)=>{
+    console.log(pedido);
 }
 
 
