@@ -23,16 +23,16 @@ class Server {
        this.app.use('/', require ('../routes/tienda'));          
     }
     //Base de datos
-     dbConnection(){
+    //  dbConnection(){
        
             
-            db.connect((err)=>{
-                if(err) throw err;
-                console.log('bdd conectada');          
-            });
+    //         db.connect((err)=>{
+    //             if(err) throw err;
+    //             console.log('bdd conectada');          
+    //         });
 
        
-    }    
+    // }    
 
 
     listen(){
