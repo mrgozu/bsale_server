@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('../db/connection');
+// const db = require('../db/connection');
 
 
 class Server {
@@ -10,7 +10,7 @@ class Server {
         
         this.middlewares();
         this.routes();
-        this.dbConnection();
+        // this.dbConnection();
     }
 
     //Metodos
