@@ -35,3 +35,6 @@ body{
     color: lightcoral;
     vertical-align: middle;
 }
+.list-group-item{
+    white-space: pre-wrap;
+}

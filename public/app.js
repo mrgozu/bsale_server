@@ -15,13 +15,13 @@ const carro = document.getElementById('carroCompras');
 const total = document.getElementById('total');
 
 const botonVaciarCarro = document.getElementById('boton-vaciar');
-
+let data = '';
 let carroArray =[];
 let totalCarro=0;
-// const elementosDOM = ()=>{
     
-// }
 const mostrarProductos =    (productos)=>{
+        // this.data = '';
+        // this.data = productos;
         for (let producto of productos){
             let nodo = document.createElement('div');
             nodo.classList.add('card');
@@ -43,7 +43,7 @@ const mostrarProductos =    (productos)=>{
 
             let nodoButtonUp = document.createElement('button');
             nodoButtonUp.classList.add('btn','p-0');
-            nodoButtonUp.setAttribute('marcador', producto['name']);
+            nodoButtonUp.setAttribute('marcador', producto['id']);
             nodoButtonUp.addEventListener('click',agregarCarro);
 
             let nodoButtonUpIcon = document.createElement('i');
@@ -70,12 +70,11 @@ const mostrarProductos =    (productos)=>{
 const renderCarro =  ()=>{
     carro.textContent = '';
     let carroUnico = [... new Set(carroArray)];
-    console.log('carroUnico'+carroUnico);
-    carroUnico.forEach(async (producto, index) =>{
-        console.log('producto '+producto);
-        let miProducto =  await obtenerDatosServidor(`busqueda/${producto}`);
-        console.log(miProducto);
-        let cantidadProducto = carroArray.reduce((total, productName)=>productName===producto?total+=1:total ,0);
+    carroUnico.forEach( (producto, index) =>{
+        let miProducto = this.data.filter((data)=>{
+            return data['id']==producto
+        })
+        let cantidadProducto = carroArray.reduce((total, productId)=>productId===producto?total+=1:total ,0);
         
         let nodo = document.createElement('li');
         nodo.classList.add('list-group-item','text-right', 'mx-2');
@@ -108,12 +107,12 @@ function borrarProductoCarro(){
 const calcularTotal = async ()=>{
     
     totalCarro = 0;
-    console.log(carroArray);
     for (let producto of carroArray) {
-         let miProducto = await obtenerDatosServidor(`busqueda/${producto}`)
-                            
-         console.log(miProducto[0]['discountPrice']);
-         totalCarro = totalCarro + miProducto[0]['discountPrice'];
+         let miProducto = this.data.filter((data)=>{
+            return data['id']==producto;
+        })
+        totalCarro = totalCarro + miProducto[0]['discountPrice'];
+
      }
      total.textContent = totalCarro.toFixed(2);
 }
@@ -129,7 +128,8 @@ botonVaciarCarro.addEventListener('click',vaciarCarro);
 
 // Muestra todos los productos
 const obtenerListaProductos = async()=>{
-    mostrarProductos( await obtenerDatosServidor());
+    this.data=await obtenerDatosServidor()
+    mostrarProductos( this.data);
 }
 //Busqueda por nombre
 const busqueda = async(termino)=>{
