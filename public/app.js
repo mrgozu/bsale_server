@@ -2,7 +2,6 @@
 const obtenerDatosServidor = async (param = 'completa')=>{
     try {
         const resp  = await fetch(`https://bsaleserver.herokuapp.com/${param}`);
-        // const resp  = await fetch(`http://localhost:8080/${param}`);
         if (!resp.ok) throw ('no fue posible cargar los datos');
         return  await resp.json();
     } catch (error) {
@@ -11,8 +10,14 @@ const obtenerDatosServidor = async (param = 'completa')=>{
 }
 
 const card  = document.getElementById('cardProducto');
-inputBuscador=document.getElementById('inputBuscador');
-carrito = document.getElementById('carroCompras');
+const inputBuscador=document.getElementById('inputBuscador');
+const carro = document.getElementById('carroCompras');
+const total = document.getElementById('total');
+
+const botonVaciarCarro = document.getElementById('boton-vaciar');
+
+let carroArray =[];
+let totalCarro=0;
 // const elementosDOM = ()=>{
     
 // }
@@ -38,60 +43,108 @@ const mostrarProductos =    (productos)=>{
 
             let nodoButtonUp = document.createElement('button');
             nodoButtonUp.classList.add('btn','p-0');
-            nodoButtonUp.setAttribute('marcador', producto['id']);
+            nodoButtonUp.setAttribute('marcador', producto['name']);
             nodoButtonUp.addEventListener('click',agregarCarro);
 
             let nodoButtonUpIcon = document.createElement('i');
             nodoButtonUpIcon.classList.add('fas', 'fa-caret-up')
-            
-            let nodoButtonDown = document.createElement('button');
-            nodoButtonDown.classList.add('btn','p-0');
-            nodoButtonDown.setAttribute('marcador', producto['id']);
-            nodoButtonDown.addEventListener('click',descontarCarro);
 
-            let nodoButtonDownIcon = document.createElement('i');
-            nodoButtonDownIcon.classList.add('fas', 'fa-caret-down')
-            
             //Insertar al DOM
             nodo.appendChild(nodoImage)
             nodoBody.appendChild(nodoName);
             nodoBody.appendChild(nodoPrice);
             nodoPrice.appendChild(nodoButtonUp);
-            nodoPrice.appendChild(nodoButtonDown);
             nodoButtonUp.appendChild(nodoButtonUpIcon);
-            nodoButtonDown.appendChild(nodoButtonDownIcon);
             nodo.appendChild(nodoBody);
             card.appendChild(nodo);
         }    
 }
-const agregarCarro = ()=>{
-
+ function agregarCarro (){
+    carroArray.push(this.getAttribute('marcador'));
+    calcularTotal();
+    renderCarro();
+    
 };
-const descontarCarro = ()=>{
 
-};
+
+const renderCarro =  ()=>{
+    carro.textContent = '';
+    let carroUnico = [... new Set(carroArray)];
+    console.log('carroUnico'+carroUnico);
+    carroUnico.forEach(async (producto, index) =>{
+        console.log('producto '+producto);
+        let miProducto =  await obtenerDatosServidor(`busqueda/${producto}`);
+        console.log(miProducto);
+        let cantidadProducto = carroArray.reduce((total, productName)=>productName===producto?total+=1:total ,0);
+        
+        let nodo = document.createElement('li');
+        nodo.classList.add('list-group-item','text-right', 'mx-2');
+        nodo.textContent = `${cantidadProducto} x ${miProducto[0]['name']} - $ ${miProducto[0]['discountPrice']}`
+        
+        let botonBorrar = document.createElement('button');
+        botonBorrar.classList.add('btn', 'btn-danger', 'mx-5');
+        botonBorrar.textContent = 'X';
+        botonBorrar.style.marginLeft = '1rem';
+        botonBorrar.setAttribute('producto', producto);
+        botonBorrar.addEventListener('click', borrarProductoCarro);
+
+        nodo.appendChild(botonBorrar);
+        carro.appendChild(nodo); 
+    });
+}
+function borrarProductoCarro(){
+
+    let id = this.getAttribute('producto');
+
+    carroArray = carroArray.filter( (productoName)=> {
+         return productoName !== id;
+     });
+
+     renderCarro();
+
+     calcularTotal();
+}
+
+const calcularTotal = async ()=>{
+    
+    totalCarro = 0;
+    console.log(carroArray);
+    for (let producto of carroArray) {
+         let miProducto = await obtenerDatosServidor(`busqueda/${producto}`)
+                            
+         console.log(miProducto[0]['discountPrice']);
+         totalCarro = totalCarro + miProducto[0]['discountPrice'];
+     }
+     total.textContent = totalCarro.toFixed(2);
+}
+
+const vaciarCarro = ()=>{
+    carroArray=[];
+    renderCarro();
+    calcularTotal();
+}
+botonVaciarCarro.addEventListener('click',vaciarCarro);
+
+
+
 // Muestra todos los productos
 const obtenerListaProductos = async()=>{
-   
-    const productos = await obtenerDatosServidor();
-    mostrarProductos(productos);
+    mostrarProductos( await obtenerDatosServidor());
 }
 //Busqueda por nombre
 const busqueda = async(termino)=>{
-    const resultadoBusqueda = await obtenerDatosServidor(`busqueda/${termino}`);
-    resultadoBusqueda.forEach(mostrarProductos);
+    mostrarProductos( await obtenerDatosServidor(`busqueda/${termino}`));
 }
 //RecargarProductos
 const recargarLista =async ()=>{
     while (card.firstChild) {
         card.removeChild(card.firstChild);
       }
-    const productos = await obtenerDatosServidor();
-    productos.forEach(mostrarProductos);
+    mostrarProductos( await obtenerDatosServidor());
 }
 
 
-//eventoBusqueda
+//Permite buscar tanto apretando la tecla 'enter' como la lupa
 const eventoBusqueda = (event)=>{
     if(event &&event.keyCode!='13'){
     }else{
@@ -101,27 +154,9 @@ const eventoBusqueda = (event)=>{
         busqueda(inputBuscador.value);
     }    
 }
-//Evento agregar pedido
-const agregarPedido= (pedido)=>{
-    console.log(pedido);
-}
-
-
-
-//  construccion html
-const init  = () =>{
-    obtenerListaProductos();
-    // elementosDOM();
-    
-    
-    
-}
-
-
-
-
-
-// ejecuciones
-init();
+//Ejecucion inicial
+obtenerListaProductos();
+calcularTotal();
+renderCarro();
 
 
