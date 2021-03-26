@@ -1,18 +1,37 @@
 body{
-    background: lightgray;
+    background: white!important;
     
 }
 
 .card {
     margin-bottom: 20px!important;
     height: 350px!important;
+    background-color: whitesmoke!important;
+    /* border:1px!important; */
+    /* borde */
+
 }
 
 .imagen{
     height: 250px;
     object-fit: contain;
+    border-radius: 100%!important;
+    background-color: whitesmoke;
+
     /* max-width: ; */
 }
 .justify-content-end{
     margin-right: 0px!important;
+}
+.fa-caret-up{
+    font-size: 2rem;
+    color: lightblue;
+    vertical-align: middle;
+
+
+}
+.fa-caret-down{
+    font-size: 2rem;
+    color: lightcoral;
+    vertical-align: middle;
 }

@@ -1,96 +1,93 @@
-//  solicitudes http
-const obtenerDatos = async (param = 'completa')=>{
+
+const obtenerDatosServidor = async (param = 'completa')=>{
     try {
         const resp  = await fetch(`https://bsaleserver.herokuapp.com/${param}`);
-        if (!resp.ok) throw ('no se pudo cargar los datos');
-        
+        // const resp  = await fetch(`http://localhost:8080/${param}`);
+        if (!resp.ok) throw ('no fue posible cargar los datos');
         return  await resp.json();
-       
     } catch (error) {
         console.log('Error '+error);
     }
-
-}
-// visualizacion de la pagina 
-const body = document.body;
-let card;
-const crearHtml = () =>{
-    const html = `   
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
-    <div class="container">
-        <a class="navbar-brand mx-5" onclick=recargarLista() href="#">BsaleTest</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse w-100" id="navbarSupportedContent">
-                <input class="form-control mr-sm-2 w-75" type="search" placeholder="" onkeyup="eventoBusqueda(event)" aria-label="Search" id='inputBuscador' name='inputBuscador'/>
-                <button class="btn" onclick="eventoBusqueda()" type="button">
-                    <i class="fas fa-search"></i>
-                </button>
-        </div>
-
-    </div>
-</nav>
-<div class="container">
-    <div class="row row-cols-1 row-cols-md-3" id="cardProducto">
-            
-      </div>
-
-</div>`;
-    const divHome = document.createElement('div');
-    divHome.innerHTML = html;
-    body.append(divHome);
 }
 
-// eventos (obtener id, btn, etc)
-const eventos = ()=>{
-    card  = document.getElementById('cardProducto');
-    // buscador = document.querySelector('#buscador');
-    inputBuscador=document.getElementById('inputBuscador');
-    carrito = document.getElementById('carro');
+const card  = document.getElementById('cardProducto');
+inputBuscador=document.getElementById('inputBuscador');
+carrito = document.getElementById('carroCompras');
+// const elementosDOM = ()=>{
     
-}
+// }
+const mostrarProductos =    (productos)=>{
+        for (let producto of productos){
+            let nodo = document.createElement('div');
+            nodo.classList.add('card');
+            
+            let nodoImage = document.createElement('img');
+            nodoImage.classList.add('imagen');
+            nodoImage.setAttribute('src', producto['url_image']||'./assets/img/image-not-found.png')
+            
+            let nodoBody = document.createElement('div');
+            nodoBody.classList.add('card-body');
 
-//  Card en que se mostraran los productos, recibe listado de productos
-const mostrarProducto =    (producto)=>{
-        const divCard = document.createElement('div');
-        //Se aproxima haciaa el numero superior del precio descuento (para evitar decimales)
-        precioMostrado = Math.ceil(producto.discountPrice); 
-        divCard.innerHTML = `
-        <div class='card  '>
-            <img src="${producto.url_image||'./assets/img/image-not-found.png'}" class="imagen" alt="...">
-            <div class="card-body ">
-                <h5 class="card-title ">${producto.name}</h5>
-                <p class="card-text border-top text-center font-weight-bold  ">$${precioMostrado}</p>
-            </div>
-                
+            let nodoName = document.createElement('h5');
+            nodoName.classList.add('card-title');
+            nodoName.textContent= producto['name'];
+
+            let nodoPrice = document.createElement('p');
+            nodoPrice.classList.add('card-text','border-top', 'text-center', 'font-weight-bold');
+            nodoPrice.textContent= '$'+Math.ceil(producto['discountPrice']);
+
+            let nodoButtonUp = document.createElement('button');
+            nodoButtonUp.classList.add('btn','p-0');
+            nodoButtonUp.setAttribute('marcador', producto['id']);
+            nodoButtonUp.addEventListener('click',agregarCarro);
+
+            let nodoButtonUpIcon = document.createElement('i');
+            nodoButtonUpIcon.classList.add('fas', 'fa-caret-up')
             
+            let nodoButtonDown = document.createElement('button');
+            nodoButtonDown.classList.add('btn','p-0');
+            nodoButtonDown.setAttribute('marcador', producto['id']);
+            nodoButtonDown.addEventListener('click',descontarCarro);
+
+            let nodoButtonDownIcon = document.createElement('i');
+            nodoButtonDownIcon.classList.add('fas', 'fa-caret-down')
             
-        </div>`;
-        divCard.classList.add('col')
-        card.append(divCard);
-    
+            //Insertar al DOM
+            nodo.appendChild(nodoImage)
+            nodoBody.appendChild(nodoName);
+            nodoBody.appendChild(nodoPrice);
+            nodoPrice.appendChild(nodoButtonUp);
+            nodoPrice.appendChild(nodoButtonDown);
+            nodoButtonUp.appendChild(nodoButtonUpIcon);
+            nodoButtonDown.appendChild(nodoButtonDownIcon);
+            nodo.appendChild(nodoBody);
+            card.appendChild(nodo);
+        }    
 }
+const agregarCarro = ()=>{
+
+};
+const descontarCarro = ()=>{
+
+};
 // Muestra todos los productos
 const obtenerListaProductos = async()=>{
    
-    const productos = await obtenerDatos();
-    productos.forEach(mostrarProducto);
+    const productos = await obtenerDatosServidor();
+    mostrarProductos(productos);
 }
 //Busqueda por nombre
 const busqueda = async(termino)=>{
-    const resultadoBusqueda = await obtenerDatos(`busqueda/${termino}`);
-    resultadoBusqueda.forEach(mostrarProducto);
+    const resultadoBusqueda = await obtenerDatosServidor(`busqueda/${termino}`);
+    resultadoBusqueda.forEach(mostrarProductos);
 }
 //RecargarProductos
 const recargarLista =async ()=>{
     while (card.firstChild) {
         card.removeChild(card.firstChild);
       }
-    const productos = await obtenerDatos();
-    productos.forEach(mostrarProducto);
+    const productos = await obtenerDatosServidor();
+    productos.forEach(mostrarProductos);
 }
 
 
@@ -113,9 +110,8 @@ const agregarPedido= (pedido)=>{
 
 //  construccion html
 const init  = () =>{
-    crearHtml();
     obtenerListaProductos();
-    eventos();
+    // elementosDOM();
     
     
     
