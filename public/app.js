@@ -20,8 +20,7 @@ let carroArray =[];
 let totalCarro=0;
     
 const mostrarProductos =    (productos)=>{
-        // this.data = '';
-        // this.data = productos;
+      
         for (let producto of productos){
             let nodo = document.createElement('div');
             nodo.classList.add('card');
@@ -154,6 +153,15 @@ const eventoBusqueda = (event)=>{
         busqueda(inputBuscador.value);
     }    
 }
+
+
+const categoria = async (categoria)=>{
+    while (card.firstChild) {
+        card.removeChild(card.firstChild);
+      }
+    mostrarProductos( await obtenerDatosServidor(`categoria/${categoria}`));
+}
+
 //Ejecucion inicial
 obtenerListaProductos();
 calcularTotal();
